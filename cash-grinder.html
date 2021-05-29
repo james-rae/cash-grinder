@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cash Grinder</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.6.0/css/bootstrap.min.css" />
+</head>
+<body>
+
+<div class="container-fluid">
+    <!-- Input field for the saved state -->
+    <div class="row">
+        <div class="form-group col-md-12">
+            <label>Saved State (paste it in the box!)</label>
+            <input class="form-control" type="text" id="saveInput" value="" />
+            <button class="btn btn-default" id='cmdEnhance'>Enhance</button>
+        </div>
+
+    </div>
+
+    <div class="row"><div class="form-group col-md-12">
+    </div></div>
+
+    <!--Calculator Params -->
+    <!--Age Stuff -->
+    <div class="row">
+        <div class="form-group col-md-4">
+            <label>YOB</label>
+            <input class="form-control" type="text" id="yob" value="" />
+        </div>
+        <div class="form-group col-md-4">
+            <label>Emp Start Age</label>
+            <input class="form-control" type="text" id="empStart" value="" />
+        </div>
+        <div class="form-group col-md-4">
+            <label>Emp End Age</label>
+            <input class="form-control" type="text" id="empEnd" value="" />
+        </div>
+    </div>
+
+    <!--Benefit Start Ages -->
+    <div class="row">
+        <div class="form-group col-md-4">
+            <label>OAS Age</label>
+            <input class="form-control" type="text" id="oas" value="" />
+        </div>
+        <div class="form-group col-md-4">
+            <label>CCP Age</label>
+            <input class="form-control" type="text" id="ccp" value="" />
+        </div>
+        <div class="form-group col-md-4">
+            <label>Pension Age</label>
+            <input class="form-control" type="text" id="pension" value="" />
+        </div>
+    </div>
+
+    <!--RRSP Stuff -->
+    <div class="row">
+        <div class="form-group col-md-4">
+            <label>RRSP Start Age</label>
+            <input class="form-control" type="text" id="rrspStart" value="" />
+        </div>
+        <div class="form-group col-md-4">
+            <label>RRSP End Age</label>
+            <input class="form-control" type="text" id="rrspEnd" value="" />
+        </div>
+        <div class="form-group col-md-4">
+            <label>RRSP Balance</label>
+            <input class="form-control" type="text" id="rrspBal" value="" />
+        </div>
+    </div>
+
+    <!--Others -->
+    <div class="row">
+        <div class="form-group col-md-4">
+            <label>Avg Salary</label>
+            <input class="form-control" type="text" id="salary" value="" />
+        </div>
+        <div class="form-group col-md-4">
+            <label>Avg Expenses</label>
+            <input class="form-control" type="text" id="expenses" value="" />
+        </div>
+        <div class="form-group col-md-4">
+            <label>Blank</label>
+            <input class="form-control" type="text" id="blank2" value="" />
+        </div>
+    </div>
+
+    <!--Output -->
+    <!-- https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_table_insert_deleterow , https://www.w3schools.com/jsref/met_table_insertrow.asp -->
+    <div class="row"><div class="form-group col-md-12">
+        <table class="table" id="dataTable">
+            <thead>
+              <tr>
+                <th scope="col">Age</th>
+                <th scope="col">Total Inc</th>
+                <th scope="col">Net Inc</th>
+                <th scope="col">RRSP</th>
+                <th scope="col">CPP</th>
+                <th scope="col">OAS</th>
+                <th scope="col">Pension</th>
+                <th scope="col">Bridge</th>
+                <th scope="col">Tax</th>
+                <th scope="col">Expenses</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+    </div></div>
+
+    <div class="row"><div class="form-group col-md-12">
+        <label>Save Output</label>
+        <input class="form-control" type="text" id="saveOutput" value="" />
+    </div></div>
+
+    <div class="row"><div id="log" class="form-group col-md-12">
+    </div></div>
+
+
+</div>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.6.0/js/bootstrap.min.js"></script>
+<script scr="grinder.js"></script>
+
+</body>
+</html>
