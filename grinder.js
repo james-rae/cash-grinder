@@ -1,11 +1,61 @@
 // https://www.carlosag.net/tools/codetranslator/
 
+const id = {
+    table: 'dataTable',
+    desc: 'desc',
+    expn: 'expenses',
+    salary: 'salary',
+    rrspBal: 'rrspBal',
+    rrspStart: 'rrspStart',
+    rrspEnd: 'rrspEnd',
+    pension: 'pension',
+    ccp: 'ccp',
+    oas: 'oas',
+    empStart: 'empStart',
+    empEnd: 'empEnd',
+    yob: 'yob',
+    saveIn: 'saveInput',
+    saveOut: 'saveOutput'
+}
+
+const YMPE = 57400;
+
+const table = document.getElementById(id.table);
+
+function clearTable() {
+    while (table.rows.length > 1) {
+        // delete last row
+        table.deleteRow(-1);
+    }
+}
+
+function addRow(inputArray) {
+    const newRow = table.insertRow(-1);
+    inputArray.forEach((tVal, i) => {
+        const cell = newRow.insertCell(i);
+        cell.innerHTML = t2i(tVal);
+    });
+}
+
 function getVal(elemId) {
     return $(`#${elemId}`).val();
 }
 
 function setVal(elemId, val) {
     $(`#${elemId}`).val(val);
+}
+
+// returns object with same keys as id, but values are box values
+function getAllInput() {
+    const nugget = {};
+    Object.values(id).map(prop => {
+        nugget[prop] = getVal(prop);
+    });
+    return nugget;
+}
+
+function t2i(textIn) {
+    return parseInt(textIn);
 }
 
 function calcTax(iIncome) {
@@ -68,8 +118,8 @@ function calcPension(iYearsOfService, iAge, iAvgSalaryFive) {
     // y = years Of service up To 35
     // YMPE = maximum pensionable earnings = 57400 In 2019
     // unreduced annual amount = (max(As, YMPE) * 0.01375 * y) + (max(aS - ympe, 0) * 0.02 * y)
-    let iUnreducedPension = ((Math.Max(iAvgSalaryFive, YMPE) * (0.01375 * iYearsOfService))
-                + (Math.Max((iAvgSalaryFive - YMPE), 0) * (0.02 * iYearsOfService)));
+    let iUnreducedPension = ((Math.max(iAvgSalaryFive, YMPE) * (0.01375 * iYearsOfService))
+                + (Math.max((iAvgSalaryFive - YMPE), 0) * (0.02 * iYearsOfService)));
     if ((iAge > 59)) {
         return iUnreducedPension;
     }
@@ -86,6 +136,22 @@ function grindProjection() {
     // TODO have a function that rips out all the params, puts them in an array.
     //      can leverage that for the save, and this
 
+    // TODO add in LIRA
+
+    const vals = getAllInput();
+
+    const iStartAge = t2i(vals[id.empStart]);
+    const iQuitAge = t2i(vals[id.empEnd]);
+    const iOasAge = t2i(vals[id.oas]);
+    const iCppAge = t2i(vals[id.ccp]);
+    const iPensionAge = t2i(vals[id.pension]);
+    const iAvgSalary = t2i(vals[id.salary]);
+    const iExpenseAmt = t2i(vals[id.expn]);
+    const iRrspAmt = t2i(vals[id.rrspBal]);
+    const iRrspEnd = t2i(vals[id.rrspEnd]);
+    const iRrspStart = t2i(vals[id.rrspStart]);
+
+
     // algorithm:
     // For Each year
     // figure out what things are applicable
@@ -95,138 +161,42 @@ function grindProjection() {
     // - oas
     // subtract tax
     // expenses
-    let iCppAmt = calcCpp(this.CppAge);
-    let iOasAmt = calcOas(this.OasAge);
-    let iYearsOfService = (this.QuitAge - this.StartAge);
-    let iBridgeAmt = calcBridge(iYearsOfService);
-    let iPensionAmt = calcPension(iYearsOfService, this.PensionAge, this.AvgSalary);
-    let iExpenseAmt = totalExpenses();
-    let iRRSPAmt = (this.RrspAmt / (1 + (RrspEnd - RrspStart)));
-    let oReport; // list of strings/stuff
-    oReport.Add(Tabify("Age", "Total Inc", "Net Inc", "RRSP", "CPP", "OAS", "PEN", "BRD", "TAX", "EXP"));
-    for (let iAge = this.QuitAge; (iAge <= 95); iAge++) {
-        let iRR = (((iAge >= this.RrspStart) && (iAge <= this.RrspEnd)) ? iRRSPAmt : 0 );
-        let iCp = ((iAge >= this.CppAge) ? iCppAmt : 0 );
-        let iOa = ((iAge >= this.OasAge) ? iOasAmt : 0 );
-        let iBr = (((iAge >= this.PensionAge) && (iAge < 65)) ? iBridgeAmt : 0 );
-        let iPn = ((iAge >= this.PensionAge) ? iPensionAmt : 0 );
-        let iGross = (iRR + (iCp + (iOa + (iBr + iPn))));
-        let iTax = calcTax(iGross);
-        let iNet = (iGross - (iTax - iExpenseAmt));
-        oReport.Add(Tabify(iAge, iGross, iNet, iRR, iCp, iOa, iPn, iBr, iTax, iExpenseAmt));
+    const iCppAmt = calcCpp(iCppAge);
+    const iOasAmt = calcOas(iOasAge);
+    const iYearsOfService = (iQuitAge - iStartAge);
+    const iBridgeAmt = calcBridge(iYearsOfService);
+    const iPensionAmt = calcPension(iYearsOfService, iPensionAge, iAvgSalary);
+    const iRRSPAmt = (iRrspAmt / (1 + (iRrspEnd - iRrspStart))); // this is wrong, seems to be dropping a year
+
+    clearTable();
+
+    // oReport.Add(Tabify("Age", "Total Inc", "Net Inc", "TAX", "RRSP", "CPP", "OAS", "PEN", "BRD"));
+    for (let iAge = iQuitAge; (iAge <= 95); iAge++) {
+        const iRR = (((iAge >= iRrspStart) && (iAge <= iRrspEnd)) ? iRRSPAmt : 0 );
+        const iCp = ((iAge >= iCppAge) ? iCppAmt : 0 );
+        const iOa = ((iAge >= iOasAge) ? iOasAmt : 0 );
+        const iBr = (((iAge >= iPensionAge) && (iAge < 65)) ? iBridgeAmt : 0 );
+        const iPn = ((iAge >= iPensionAge) ? iPensionAmt : 0 );
+        const iGross = (iRR + (iCp + (iOa + (iBr + iPn))));
+        const iTax = calcTax(iGross);
+        const iNet = (iGross - (iTax + iExpenseAmt));
+        addRow([iAge, iGross, iNet, iTax, iRR, iCp, iOa, iPn, iBr]);
     }
 
-    My.Computer.Clipboard.SetText(string.Join("", oReport.ToArray()));
+    //My.Computer.Clipboard.SetText(string.Join("", oReport.ToArray()));
 }
 
 
 
-var childDataStore = {};
 
 // decode from the customized base64 format
 function decode64(string) {
     return atob(string.replace(/_/g, '/').replace(/-/g, '+'));
 }
 
-// takes an array of properties, plus the property settings in bookmark encoding.
-// returns a human readable string of the properties
-function dataToText (props, info, version) {
-    var lookup = {
-        opacity: function (value) {
-            if (version !== 'A' && value === '99') {
-                value = '100';
-            }
-            return parseInt(value) / 100;
-        },
-        visibility: function (value) {
-            return value === '1';
-        },
-        boundingBox: function (value) {
-            return value === '1';
-        },
-        snapshot: function (value) {
-            return value === '1';
-        },
-        query: function (value) {
-            return value === '1';
-        }
-    };
-
-    var result = '';
-
-    props.forEach(function(prop, index) {
-        result += (prop + ': ' + lookup[prop](info[index]) + ', ' );
-    });
-    return result;
-}
-
-// returns a human readable string of properties for a child layer fragment of a bookmark
-function childDataToText(childData, version) {
-    var cFormat = /^(\d{2})(\d{1})(\d{1})(.+?)$/;
-    var cInfo = childData.match(cFormat);
-    return 'service index: ' + cInfo[4] + ', ' + dataToText([, 'opacity', 'visibility', 'query'], cInfo, version);
-};
-
 // keeping things totally separate to avoid piles of IF statements
 
-function decodeVerA(bookmark) {
 
-    var pattern = /^([^,]+),([^,]+),([^,]+),([^,]+),([^,]+)(?:$|,(.*)$)/i;
-    // things for specific layers:[ layer type name, regex to strip data from id, regex to parse data, property names in data ]
-    var layerSpec = [
-        ['Feature', /^(.+?)(\d{7})$/, /^(\d{3})(\d{1})(\d{1})(\d{1})(\d{1})$/, [, 'opacity', 'visibility', 'boundingBox', 'snapshot', 'query']],
-        ['Wms', /^(.+?)(\d{6})$/, /^(\d{3})(\d{1})(\d{1})(\d{1})$/, [, 'opacity', 'visibility', 'boundingBox', 'query']],
-        ['Tile', /^(.+?)(\d{5})$/, /^(\d{3})(\d{1})(\d{1})$/, [, 'opacity', 'visibility', 'boundingBox']],
-        ['Dynamic', /^(.+?)(\d{6})$/, /^(\d{3})(\d{1})(\d{1})(\d{1})$/, [, 'opacity', 'visibility', 'boundingBox', 'query']],
-        ['Image', /^(.+?)(\d{5})$/, /^(\d{3})(\d{1})(\d{1})$/, [, 'opacity', 'visibility', 'boundingBox']]
-    ];
-
-    var info = bookmark.match(pattern);
-    var version = info[1];
-    var decoded = [2, 3, 4, 5].map(function (i) { return decode64(info[i]); });
-
-    $('#version').val( 'A' );
-    $('#scale').val( decoded[3] );
-    $('#basemap').val( decoded[0] );
-    $('#x').val( decoded[1] );
-    $('#y').val( decoded[2] );
-
-    var layerList = $('#layers')[0];
-    clearList(layerList);
-    childDataStore = {};
-
-    if (info[6]) {
-        var layers = info[6].split(',');
-
-        // Generate text for all layers
-        layers.forEach(function (layer, i) {
-            layer = decode64(layer);
-
-            // strip out integer that defines the layer type
-            var layerType = parseInt(layer.substring(0, 2));
-            // split the remaining data into layer id and layer data
-            var layerGuts = layer.substring(2).match(layerSpec[layerType][1]);
-            var layerId = layerGuts[1];
-            // parse the data into discrete parts, specific to the layer type
-            var layerData = layerGuts[2].match(layerSpec[layerType][2]);
-
-            // show the raw data, and then a human friendly version of it
-            var opt = document.createElement("option");
-            opt.text = layerSpec[layerType][0] + ' Layer, id: ' + layerId + ', ' +
-                    dataToText(layerSpec[layerType][3], layerData, 'A');
-            opt.value = i;
-            layerList.add(opt);
-
-        });
-
-    }
-}
-
-function clearList(listControl) {
-    while (listControl.firstChild) {
-        listControl.removeChild(listControl.firstChild);
-    }
-}
 
 function dataToTextB (props, info) {
 
@@ -238,15 +208,6 @@ function dataToTextB (props, info) {
     return result;
 }
 
-function encodeInteger(value, bitSize) {
-    var binary = value.toString(2);
-    return '0'.repeat(bitSize - binary.length) + binary;
-}
-
-function decodeBoolean(value) {
-    // very complex
-    return value === '1';
-}
 
 function hexToBinary(value) {
     var hexes = value.match(/./g); // split into single chars
@@ -255,146 +216,15 @@ function hexToBinary(value) {
     }).join('');
 }
 
-function decodeOpacity(value) {
-    return parseInt(value, 2) / 100;
-}
-
-function extractLayerSettings(layerSettingsHex) {
-    var splitty = hexToBinary(layerSettingsHex).match(/^(.{7})(.)(.)(.)(.)(.{9})/);
-
-    return {
-        opacity: decodeOpacity(splitty[1]),
-        visibility: decodeBoolean(splitty[2]),
-        boundingBox: decodeBoolean(splitty[3]),
-        snapshot: decodeBoolean(splitty[4]),
-        query: decodeBoolean(splitty[5]),
-        childCount: parseInt(splitty[6], 2)
-    };
-}
-
-function extractChildSettings(childSettingsHex) {
-    var splitty = hexToBinary(childSettingsHex).match(/^(.{7})(.)(.)(.)(.{12})/);
-
-    return {
-        opacity: decodeOpacity(splitty[1]),
-        visibility: decodeBoolean(splitty[2]),
-        query: decodeBoolean(splitty[3]),
-        index: parseInt(splitty[5], 2),
-        root: decodeBoolean(splitty[4])
-    };
-}
-
-function decodeVerB(bookmark) {
-    var pattern = /^([^,]+),([^,]+),([^,]+),([^,]+),([^,]+)(?:$|,(.*)$)/i;
-    // things for specific layers:[ layer type name,  property names in data ]
-    var layerSpec = [
-        ['Feature', ['opacity', 'visibility', 'boundingBox', 'snapshot', 'query']],
-        ['Wms', ['opacity', 'visibility', 'boundingBox', 'query']],
-        ['Tile', ['opacity', 'visibility', 'boundingBox']],
-        ['Dynamic', ['opacity', 'visibility', 'boundingBox', 'query', 'childCount']],
-        ['Image', ['opacity', 'visibility', 'boundingBox']],
-        ['WFS', ['opacity', 'visibility', 'boundingBox', 'snapshot', 'query']]
-    ];
-
-    var info = bookmark.match(pattern);
-    var version = info[1];
-    var decoded = [2, 3, 4, 5].map(function (i) { return decode64(info[i]); });
-
-    // if we have the blank flag set, format it nicely
-    var basemap = decoded[0].substring(0, decoded[0].length - 1);
-    if (decoded[0].substr(decoded[0].length - 1, 1) === '1') {
-        basemap = `blank basemap [${basemap}]`;
-    }
-
-    $('#version').val( 'B' );
-    $('#scale').val( decoded[3] );
-    $('#basemap').val( basemap );
-    $('#x').val( decoded[1] );
-    $('#y').val( decoded[2] );
-
-    var layerList = $('#layers')[0];
-    clearList(layerList);
-    childDataStore = {};
-
-    if (info[6]) {
-        var layers = info[6].split(',');
-
-        // Generate text for all layers
-        layers.forEach(function (layer, i) {
-            layer = decodeURIComponent(decode64(layer));
-
-            // strip out hex char that defines the layer type
-            var layerCode = parseInt(layer.substr(0, 1));
-
-            // split the remaining data into layer id and layer data
-            var layerSettings = extractLayerSettings(layer.substr(1, 5));
-            var layerId = layer.substr(6 + (layerSettings.childCount * 6));
-
-            // rip off child data if we are dynamic
-            if (layerSettings.childCount > 0) {
-
-                var textArray = [];
-                var childrenInfo = layer.substr(6, layerSettings.childCount * 6);
-                var childItems = childrenInfo.match(/.{6}/g);
-
-                // process the children and store them in our persistant var, so it can be accessed if
-                // someone clicks on the parent
-
-                childItems.forEach(function (cData) {
-                    var childSettings = extractChildSettings(cData);
-                    var prefix = childSettings.root ? 'Root Child: ' : 'Non Root Child: ';
-
-                    textArray.push( prefix  +
-                        dataToTextB(['index', 'opacity', 'visibility', 'query' ], childSettings));
-                });
-
-                childDataStore[i.toString()] = textArray;
-
-            }
-
-            // show data
-            var opt = document.createElement("option");
-            opt.text = layerSpec[layerCode][0] + ' Layer, id: ' + layerId + ', ' +
-                    dataToTextB(layerSpec[layerCode][1], layerSettings);
-            opt.value = i;
-            layerList.add(opt);
-
-        });
-
-    }
-}
-
+// click handlers
 $(document).ready(function () {
 
     $('#cmdEnhance').click( function() {
-        // enhance the bookmark into human readable form
-
-        var bookmark = $('#encodebook').val();
-
-        // if full URL is supplied, only take the rv param
-        var keyStart = bookmark.indexOf('rv=');
-        if (keyStart > -1) {
-            var nextAnd = bookmark.indexOf('&', keyStart + 3);
-            if (nextAnd === -1) {
-                // no more url params after the bookmark, so set it up to read to the end of the string
-                nextAnd = bookmark.length;
-            }
-            bookmark = bookmark.substring(keyStart + 3, nextAnd);
-        }
-
-        var version = bookmark.match(/^([^,]+)/)[0];
-
-        switch (version) {
-            case 'A':
-                decodeVerA(bookmark);
-                break;
-            case 'B':
-                decodeVerB(bookmark);
-                break;
-        }
-
+        // run a projection
+        grindProjection();
     });
 
+    /*
     $('#cmdRaw').click( function() {
         // enhance the bookmark into human readable form
 
@@ -422,7 +252,8 @@ $(document).ready(function () {
         $('#rawout').val( rawOut );
 
     });
-
+*/
+/*
     $('#layers').click( function(e) {
         var idx = e.currentTarget.value;
         var childList = $('#childs')[0];
@@ -442,5 +273,5 @@ $(document).ready(function () {
             });
         }
     });
-
+*/
 });
