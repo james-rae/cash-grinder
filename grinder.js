@@ -18,6 +18,9 @@ const id = {
     saveOut: 'saveOutput'
 }
 
+const saveOrder = [ id.yob, id.empStart, id.empEnd, id.oas, id.ccp, id.pension, id.salary, id.expn, id.rrspBal, id.rrspEnd, id.rrspStart, id.desc ];
+
+// TODO update to this year
 const YMPE = 57400;
 
 const table = document.getElementById(id.table);
@@ -58,7 +61,7 @@ function t2i(textIn) {
     return parseInt(textIn);
 }
 
-function calcTax(iIncome) {
+function calcTax(iIncome, iAge) {
     // TODO update to 2020 brackets/rates
     let iTax;
     // fed
@@ -86,6 +89,16 @@ function calcTax(iIncome) {
     }
 
     // TODO factor in tax credits, how age affects that
+    // TODO add in pension income tax credit
+    // 2020 ontario personal amount is 10,783
+
+    // AGE AMOUNT
+    if (iAge > 64) {
+        // 2020 rates
+        const canAge = ((7637 - (Math.max(0, iIncome - 38508) * 0.15 )) * 0.15);
+        const ontAge = ((5312 - (Math.max(0, iIncome - 39546) * 0.15 )) * 0.15);
+        iTax = iTax - (canAge + ontAge);
+    }
 
     return iTax;
 }
@@ -151,7 +164,6 @@ function grindProjection() {
     const iRrspEnd = t2i(vals[id.rrspEnd]);
     const iRrspStart = t2i(vals[id.rrspStart]);
 
-
     // algorithm:
     // For Each year
     // figure out what things are applicable
@@ -178,25 +190,19 @@ function grindProjection() {
         const iBr = (((iAge >= iPensionAge) && (iAge < 65)) ? iBridgeAmt : 0 );
         const iPn = ((iAge >= iPensionAge) ? iPensionAmt : 0 );
         const iGross = (iRR + (iCp + (iOa + (iBr + iPn))));
-        const iTax = calcTax(iGross);
+        const iTax = calcTax(iGross, iAge);
         const iNet = (iGross - (iTax + iExpenseAmt));
         addRow([iAge, iGross, iNet, iTax, iRR, iCp, iOa, iPn, iBr]);
     }
 
+    // find something else?
     //My.Computer.Clipboard.SetText(string.Join("", oReport.ToArray()));
 }
-
-
-
 
 // decode from the customized base64 format
 function decode64(string) {
     return atob(string.replace(/_/g, '/').replace(/-/g, '+'));
 }
-
-// keeping things totally separate to avoid piles of IF statements
-
-
 
 function dataToTextB (props, info) {
 
@@ -216,6 +222,29 @@ function hexToBinary(value) {
     }).join('');
 }
 
+function saveData() {
+    const vals = getAllInput();
+    const saveString = saveOrder.map(s => vals[s]).join('~');
+    const save64 = btoa(saveString);
+    setVal(id.saveOut, save64);
+    // TODO easy way to put in clipboard?
+}
+
+function loadData() {
+
+    // get value, decode, split into array
+    const save64 = getVal(id.saveIn);
+    const saveString = atob(save64);
+    const saveVals = saveString.split('~');
+
+    // stuff into fields
+    saveOrder.forEach((sId, i) => setVal(sId, saveVals[i]));
+
+    // enhance
+    grindProjection();
+}
+
+
 // click handlers
 $(document).ready(function () {
 
@@ -224,35 +253,14 @@ $(document).ready(function () {
         grindProjection();
     });
 
-    /*
-    $('#cmdRaw').click( function() {
-        // enhance the bookmark into human readable form
-
-        var bookmark = $('#encodebook').val();
-
-        // if full URL is supplied, only take the rv param
-        var keyStart = bookmark.indexOf('rv=');
-        if (keyStart > -1) {
-            var nextAnd = bookmark.indexOf('&', keyStart + 3);
-            if (nextAnd === -1) {
-                // no more url params after the bookmark, so set it up to read to the end of the string
-                nextAnd = bookmark.length;
-            }
-            bookmark = bookmark.substring(keyStart + 3, nextAnd);
-        }
-
-        var rawOut = bookmark.split(',').map(function(nugget, idx) {
-            if (idx === 0) {
-                return nugget;
-            } else {
-                return decode64(nugget);
-            }
-        }).join(',');
-
-        $('#rawout').val( rawOut );
-
+    $('#cmdSave').click( function() {
+        saveData();
     });
-*/
+
+    $('#cmdLoad').click( function() {
+        loadData();
+    });
+
 /*
     $('#layers').click( function(e) {
         var idx = e.currentTarget.value;
