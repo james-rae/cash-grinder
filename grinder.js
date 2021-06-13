@@ -20,8 +20,9 @@ const id = {
 
 const saveOrder = [ id.yob, id.empStart, id.empEnd, id.oas, id.ccp, id.pension, id.salary, id.expn, id.rrspBal, id.rrspEnd, id.rrspStart, id.desc ];
 
-// TODO update to this year
-const YMPE = 57400;
+// 2020 values
+const YMPE = 58700;
+const AMPE = 56440;
 
 const table = document.getElementById(id.table);
 
@@ -88,34 +89,49 @@ function calcTax(iIncome, iAge) {
         }
     }
 
-    // TODO factor in tax credits, how age affects that
-    // TODO add in pension income tax credit
-    // 2020 ontario personal amount is 10,783
+    // tax credits
+
+    // PESRSONAL AMOUNT
+    let canCred = 13229;
+    let ontCred = 10783;
 
     // AGE AMOUNT
     if (iAge > 64) {
         // 2020 rates
-        const canAge = ((7637 - (Math.max(0, iIncome - 38508) * 0.15 )) * 0.15);
-        const ontAge = ((5312 - (Math.max(0, iIncome - 39546) * 0.15 )) * 0.15);
-        iTax = iTax - (canAge + ontAge);
+        canCred += (7637 - (Math.max(0, iIncome - 38508) * 0.15 ));
+        ontCred += (5265 - (Math.max(0, iIncome - 39546) * 0.15 ));
     }
+
+    // PENSION INCOME AMOUNT
+    // assuming will always have > 2000 income as pensionable (LIRA, CPSP)
+    if (iAge > 64) {
+        // 2020 rates
+        canCred += 2000;
+        ontCred += 1500;
+
+    }
+
+    iTax = iTax - ((canCred * 0.15) + (ontCred * 0.0505));
 
     return iTax;
 }
 
 function calcOas(iStartAge) {
     // 7.2% per year deferred
-    return ((600 + (600 * (0.072 * (iStartAge - 65)))) * 12);
+    // 2020 Rate (Guess)
+    return ((609 + (609 * (0.072 * (iStartAge - 65)))) * 12);
 }
 
 function calcCpp(iStartAge) {
     // 7.2% per year early, 8.4% late
-    //
-    let iCpp = (1134 * 12);
+    // to get maximum, you need to contribute max amount for at least 39 years
+    // age 55 is ~ 29 yrs
+    // can view statement of contribution at https://www.canada.ca/en/employment-social-development/services/my-account.html
+    // check out https://retirehappy.ca/enhanced-cpp/ and http://www.holypotato.net/?p=1694
+    let iCpp = ( 625 * 12); // online calculator indicates the monthly is more like $625, not $1134
     if ((iStartAge < 65)) {
         iCpp = (iCpp - (iCpp * (0.072 * (65 - iStartAge))));
-    }
-    else if ((iStartAge > 65)) {
+    } else if ((iStartAge > 65)) {
         iCpp = (iCpp + (iCpp * (0.084 * (iStartAge - 65))));
     }
 
@@ -123,20 +139,21 @@ function calcCpp(iStartAge) {
 }
 
 function calcBridge(iYearsOfService) {
-    return (0.00625 * (YMPE * iYearsOfService));
+    return 0.00675 * AMPE * iYearsOfService;
 }
 
 function calcPension(iYearsOfService, iAge, iAvgSalaryFive) {
     // aS   = average highest salary of five years in a row
     // y = years Of service up To 35
-    // YMPE = maximum pensionable earnings = 57400 In 2019
-    // unreduced annual amount = (max(As, YMPE) * 0.01375 * y) + (max(aS - ympe, 0) * 0.02 * y)
-    let iUnreducedPension = ((Math.max(iAvgSalaryFive, YMPE) * (0.01375 * iYearsOfService))
-                + (Math.max((iAvgSalaryFive - YMPE), 0) * (0.02 * iYearsOfService)));
+    // AMPE = average pensionable earnings
+    // unreduced annual amount = (max(As, AMPE) * 0.01375 * y) + (max(aS - ampe, 0) * 0.02 * y)
+    // https://www.canada.ca/en/treasury-board-secretariat/services/pension-plan/plan-information/retirement-income-sources.html
+    let iUnreducedPension = ((Math.min(iAvgSalaryFive, AMPE) * (0.01375 * iYearsOfService))
+                + (Math.max((iAvgSalaryFive - AMPE), 0) * (0.02 * iYearsOfService)));
+
     if ((iAge > 59)) {
         return iUnreducedPension;
-    }
-    else {
+    } else {
         // factor = 0.05 * (60 - age)
         // reduced  amount = unreduced * (1 - factor)
         return (iUnreducedPension * (1 - (0.05 * (60 - iAge))));
@@ -153,6 +170,7 @@ function grindProjection() {
 
     const vals = getAllInput();
 
+    const iYob = t2i(vals[id.yob]);
     const iStartAge = t2i(vals[id.empStart]);
     const iQuitAge = t2i(vals[id.empEnd]);
     const iOasAge = t2i(vals[id.oas]);
@@ -192,7 +210,7 @@ function grindProjection() {
         const iGross = (iRR + (iCp + (iOa + (iBr + iPn))));
         const iTax = calcTax(iGross, iAge);
         const iNet = (iGross - (iTax + iExpenseAmt));
-        addRow([iAge, iGross, iNet, iTax, iRR, iCp, iOa, iPn, iBr]);
+        addRow([iYob + iAge, iAge, iGross, iNet, iTax, iRR, iCp, iOa, iPn, iBr]);
     }
 
     // find something else?
