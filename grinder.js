@@ -42,7 +42,7 @@ function addRow(inputArray) {
     const newRow = table.insertRow(-1);
     inputArray.forEach((tVal, i) => {
         const cell = newRow.insertCell(i);
-        cell.innerHTML = t2i(tVal);
+        cell.innerHTML = t2i(tVal); // cast to int for cheap rounding
     });
 }
 
@@ -254,6 +254,48 @@ function loadData() {
     grindProjection();
 }
 
+function copyData() {
+    const saveField = document.getElementById(id.saveIn);
+
+    // Select the text field
+    saveField.select();
+    saveField.setSelectionRange(0, 99999);
+
+    // Copy the text inside the text field
+    document.execCommand("copy");
+
+}
+
+function exportGrid() {
+
+    let sOut = '';
+
+    for (var i = 0, row; row = table.rows[i]; i++) {
+        //iterate through rows
+        let valArr = [];
+        for (var j = 0; j < row.cells.length; j++) {
+            var cell = row.cells[j]
+            valArr.push(cell.innerHTML);
+        }
+        sOut += valArr.join('\t') + '\n';
+     }
+
+    // temp text area to handle hard returns in grid export
+    const exportTextarea = document.createElement('textarea');
+
+    exportTextarea.innerHTML = sOut;
+
+    const parentElement = document.getElementById('divExport');
+    parentElement.appendChild(exportTextarea);
+
+    exportTextarea.select();
+    exportTextarea.setSelectionRange(0, 99999);
+
+    document.execCommand('copy');
+
+    parentElement.removeChild(exportTextarea);
+
+}
 
 // click handlers
 $(document).ready(function () {
@@ -269,6 +311,14 @@ $(document).ready(function () {
 
     $('#cmdLoad').click( function() {
         loadData();
+    });
+
+    $('#cmdCopy').click( function() {
+        copyData();
+    });
+
+    $('#cmdExport').click( function() {
+        exportGrid();
     });
 
 });

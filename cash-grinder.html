@@ -11,7 +11,7 @@
     <!-- Input field for the saved state -->
     <div class="row">
         <div class="form-group col-md-12">
-            <label>Saved State (paste it in the box!)</label>&nbsp;<button class="btn btn-primary" id='cmdLoad'>Load</button>&nbsp;<button class="btn btn-primary" id='cmdSave'>Save</button>
+            <label>Saved State (paste it in the box!)</label>&nbsp;<button class="btn btn-primary" id='cmdLoad'>Load</button>&nbsp;<button class="btn btn-primary" id='cmdSave'>Save</button>&nbsp;<button class="btn btn-primary" id='cmdCopy'>Copy</button>
             <input class="form-control" type="text" id="saveInput" value="" />
         </div>
 
@@ -104,7 +104,7 @@
     <!--Output -->
     <!-- https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_table_insert_deleterow , https://www.w3schools.com/jsref/met_table_insertrow.asp -->
     <div class="row"><div class="form-group col-md-12">
-        <button class="btn btn-primary" id='cmdEnhance'>Enhance</button>
+        <button class="btn btn-primary" id='cmdEnhance'>Enhance</button>&nbsp;<button class="btn btn-primary" id='cmdExport'>Export</button>
         <table class="table" id="dataTable">
             <thead>
               <tr>
@@ -127,6 +127,8 @@
     </div></div>
 
 </div>
+
+<div id="divExport"></div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"></script>
