@@ -1,30 +1,35 @@
 // https://www.carlosag.net/tools/codetranslator/
+// all amounts are for Ontario
 
 const id = {
-    table: 'dataTable',
+    ccp: 'ccp',
     desc: 'desc',
+    empEnd: 'empEnd',
+    empStart: 'empStart',
     expn: 'expenses',
-    salary: 'salary',
+    liraBal: 'liraBal',
+    liraStart: 'liraStart',
+    oas: 'oas',
+    pension: 'pension',
     rrspBal: 'rrspBal',
     rrspStart: 'rrspStart',
     rrspEnd: 'rrspEnd',
-    pension: 'pension',
-    ccp: 'ccp',
-    oas: 'oas',
-    empStart: 'empStart',
-    empEnd: 'empEnd',
-    yob: 'yob',
+    salary: 'salary',
     saveIn: 'saveInput',
-    saveOut: 'saveOutput'
+    table: 'dataTable',
+    yob: 'yob',
 }
 
-const saveOrder = [ id.yob, id.empStart, id.empEnd, id.oas, id.ccp, id.pension, id.salary, id.expn, id.rrspBal, id.rrspEnd, id.rrspStart, id.desc ];
+const saveOrder = [ id.yob, id.empStart, id.empEnd, id.oas, id.ccp, id.pension, id.salary, id.expn, id.rrspBal, id.rrspEnd, id.rrspStart, id.liraBal, id.liraStart, id.desc ];
 
 // 2020 values
 const YMPE = 58700;
 const AMPE = 56440;
 
 const table = document.getElementById(id.table);
+
+// 0 index === age 55
+const liraMax = [6.51, 6.57, 6.63, 6.70, 6.77, 6.85, 6.94, 7.04, 7.14, 7.26, 7.38, 7.52, 7.67, 7.83, 8.02, 8.22, 8.45, 8.71, 9.00, 9.34, 9.71, 10.15, 10.66, 11.25, 11.96, 12.82, 13.87, 15.19, 16.90, 19.19, 22.40, 27.23, 35.29, 51.46, 100.00];
 
 function clearTable() {
     while (table.rows.length > 1) {
@@ -181,6 +186,8 @@ function grindProjection() {
     const iRrspAmt = t2i(vals[id.rrspBal]);
     const iRrspEnd = t2i(vals[id.rrspEnd]);
     const iRrspStart = t2i(vals[id.rrspStart]);
+    const iLraStart = t2i(vals[id.liraStart]);
+    let iLiraAmt = t2i(vals[id.liraBal]);
 
     // algorithm:
     // For Each year
@@ -200,51 +207,36 @@ function grindProjection() {
 
     clearTable();
 
-    // oReport.Add(Tabify("Age", "Total Inc", "Net Inc", "TAX", "RRSP", "CPP", "OAS", "PEN", "BRD"));
     for (let iAge = iQuitAge; (iAge <= 95); iAge++) {
         const iRR = (((iAge >= iRrspStart) && (iAge <= iRrspEnd)) ? iRRSPAmt : 0 );
         const iCp = ((iAge >= iCppAge) ? iCppAmt : 0 );
         const iOa = ((iAge >= iOasAge) ? iOasAmt : 0 );
-        const iBr = (((iAge >= iPensionAge) && (iAge < 65)) ? iBridgeAmt : 0 );
+        const iBr = (((iAge >= iPensionAge) && (iAge < 65) && (iAge > 54)) ? iBridgeAmt : 0 );
         const iPn = ((iAge >= iPensionAge) ? iPensionAmt : 0 );
-        const iGross = (iRR + (iCp + (iOa + (iBr + iPn))));
+        let iLira = 0;
+        if ((iAge > 54) && (iAge >= iLraStart) && (iLiraAmt > 0)) {
+            iLira = iLiraAmt * (liraMax[iAge - 55] / 100.0);
+            iLiraAmt -= iLira;
+        }
+        const iGross = iRR + iCp + iOa + iBr + iPn + iLira;
         const iTax = calcTax(iGross, iAge);
         const iNet = (iGross - (iTax + iExpenseAmt));
-        addRow([iYob + iAge, iAge, iGross, iNet, iTax, iRR, iCp, iOa, iPn, iBr]);
+
+
+        // "Year", "Age", "Total Inc", "Net Inc", "TAX", "RRSP", "LIRA", "CPP", "OAS", "PEN", "BRD"
+        addRow([iYob + iAge, iAge, iGross, iNet, iTax, iRR, iLira, iCp, iOa, iPn, iBr]);
     }
 
     // find something else?
     //My.Computer.Clipboard.SetText(string.Join("", oReport.ToArray()));
 }
 
-// decode from the customized base64 format
-function decode64(string) {
-    return atob(string.replace(/_/g, '/').replace(/-/g, '+'));
-}
-
-function dataToTextB (props, info) {
-
-    var result = '';
-
-    props.forEach(function(prop) {
-        result += (prop + ': ' + info[prop].toString() + ', ' );
-    });
-    return result;
-}
-
-
-function hexToBinary(value) {
-    var hexes = value.match(/./g); // split into single chars
-    return hexes.map(function(h) {
-        return encodeInteger(parseInt(h, 16), 4); // 4-digit padded binary
-    }).join('');
-}
 
 function saveData() {
     const vals = getAllInput();
     const saveString = saveOrder.map(s => vals[s]).join('~');
     const save64 = btoa(saveString);
-    setVal(id.saveOut, save64);
+    setVal(id.saveIn, save64);
     // TODO easy way to put in clipboard?
 }
 
@@ -279,25 +271,4 @@ $(document).ready(function () {
         loadData();
     });
 
-/*
-    $('#layers').click( function(e) {
-        var idx = e.currentTarget.value;
-        var childList = $('#childs')[0];
-
-        clearList(childList);
-
-        if (childDataStore[idx]) {
-            // add some child stuff
-            var textArray = childDataStore[idx];
-            textArray.forEach(function(t, i) {
-
-                var opt = document.createElement("option");
-                opt.text = t;
-                opt.value = i;
-                childList.add(opt);
-
-            });
-        }
-    });
-*/
 });

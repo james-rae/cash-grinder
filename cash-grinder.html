@@ -11,9 +11,8 @@
     <!-- Input field for the saved state -->
     <div class="row">
         <div class="form-group col-md-12">
-            <label>Saved State (paste it in the box!)</label>
+            <label>Saved State (paste it in the box!)</label>&nbsp;<button class="btn btn-primary" id='cmdLoad'>Load</button>&nbsp;<button class="btn btn-primary" id='cmdSave'>Save</button>
             <input class="form-control" type="text" id="saveInput" value="" />
-            <button class="btn btn-primary" id='cmdLoad'>Load</button>
         </div>
 
     </div>
@@ -70,6 +69,22 @@
         </div>
     </div>
 
+    <!--LIRA Stuff -->
+    <div class="row">
+        <div class="form-group col-md-4">
+            <label>LIRA Start Age</label>
+            <input class="form-control" type="text" id="liraStart" value="" />
+        </div>
+        <div class="form-group col-md-4">
+            <label>LIRA Balance</label>
+            <input class="form-control" type="text" id="liraBal" value="" />
+        </div>
+        <div class="form-group col-md-4">
+            <label>Blank</label>
+            <input class="form-control" type="text" id="notUsed" value="" />
+        </div>
+    </div>
+
     <!--Others -->
     <div class="row">
         <div class="form-group col-md-4">
@@ -99,6 +114,7 @@
                 <th scope="col">Net Inc</th>
                 <th scope="col">Tax</th>
                 <th scope="col">RRSP</th>
+                <th scope="col">LIRA</th>
                 <th scope="col">CPP</th>
                 <th scope="col">OAS</th>
                 <th scope="col">Pension</th>
@@ -109,15 +125,6 @@
             </tbody>
           </table>
     </div></div>
-
-    <div class="row"><div class="form-group col-md-12">
-        <label>Save Output</label> &nbsp; <button class="btn btn-primary" id='cmdSave'>Save</button>
-        <input class="form-control" type="text" id="saveOutput" value="" />
-    </div></div>
-
-    <div class="row"><div id="log" class="form-group col-md-12">
-    </div></div>
-
 
 </div>
 
