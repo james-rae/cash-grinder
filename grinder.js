@@ -3,6 +3,7 @@
 
 const id = {
     ccp: 'ccp',
+    cohortA: 'cohortA',
     desc: 'desc',
     empEnd: 'empEnd',
     empStart: 'empStart',
@@ -147,7 +148,12 @@ function calcBridge(iYearsOfService) {
     return 0.00675 * AMPE * iYearsOfService;
 }
 
-function calcPension(iYearsOfService, iAge, iAvgSalaryFive) {
+function calcPension(iYearsOfService, iAge, iAvgSalaryFive, iTireAge) {
+
+    if (iAge < (iTireAge - 10)) {
+        return 0;
+    }
+
     // aS   = average highest salary of five years in a row
     // y = years Of service up To 35
     // AMPE = average pensionable earnings
@@ -156,14 +162,15 @@ function calcPension(iYearsOfService, iAge, iAvgSalaryFive) {
     let iUnreducedPension = ((Math.min(iAvgSalaryFive, AMPE) * (0.01375 * iYearsOfService))
                 + (Math.max((iAvgSalaryFive - AMPE), 0) * (0.02 * iYearsOfService)));
 
-    if ((iAge > 59)) {
+
+
+    if ((iAge > (iTireAge - 1))) {
         return iUnreducedPension;
-    } else {
-        // factor = 0.05 * (60 - age)
-        // reduced  amount = unreduced * (1 - factor)
-        return (iUnreducedPension * (1 - (0.05 * (60 - iAge))));
     }
 
+    // factor = 0.05 * (60 - age)
+    // reduced  amount = unreduced * (1 - factor)
+    return (iUnreducedPension * (1 - (0.05 * (iTireAge - iAge))));
 }
 
 function grindProjection() {
@@ -188,6 +195,12 @@ function grindProjection() {
     const iRrspStart = t2i(vals[id.rrspStart]);
     const iLraStart = t2i(vals[id.liraStart]);
     let iLiraAmt = t2i(vals[id.liraBal]);
+    let stdPensionAge;
+    if ($('#cohortA').prop('checked')) {
+        stdPensionAge = 60;
+    } else {
+        stdPensionAge = 65;
+    }
 
     // algorithm:
     // For Each year
@@ -202,7 +215,7 @@ function grindProjection() {
     const iOasAmt = calcOas(iOasAge);
     const iYearsOfService = (iQuitAge - iStartAge);
     const iBridgeAmt = calcBridge(iYearsOfService);
-    const iPensionAmt = calcPension(iYearsOfService, iPensionAge, iAvgSalary);
+    const iPensionAmt = calcPension(iYearsOfService, iPensionAge, iAvgSalary, stdPensionAge);
     const iRRSPAmt = (iRrspAmt / (1 + (iRrspEnd - iRrspStart))); // this is wrong, seems to be dropping a year
 
     clearTable();
