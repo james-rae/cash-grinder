@@ -190,11 +190,12 @@ function grindProjection() {
     const iPensionAge = t2i(vals[id.pension]);
     const iAvgSalary = t2i(vals[id.salary]);
     const iExpenseAmt = t2i(vals[id.expn]);
-    const iRrspAmt = t2i(vals[id.rrspBal]);
+    
     const iRrspEnd = t2i(vals[id.rrspEnd]);
     const iRrspStart = t2i(vals[id.rrspStart]);
     const iLraStart = t2i(vals[id.liraStart]);
-    let iLiraAmt = t2i(vals[id.liraBal]);
+    let iLiraAmt = Math.floor(t2i(vals[id.liraBal]) / 2); // lira trick. half goes to rrsp
+    const iRrspAmt = t2i(vals[id.rrspBal]) + iLiraAmt;
     let stdPensionAge;
     if ($('#cohortA').prop('checked')) {
         stdPensionAge = 60;
