@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Give Me The Money Lebowski</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <div class="container-fluid">
+      <!-- Input field for the saved state -->
+      <div class="row">
+        <div class="form-group col-md-12">
+          <label>Saved State (paste it in the box!)</label>&nbsp;<button
+            class="btn btn-primary"
+            id="cmdLoad"
+          >
+            Load</button
+          >&nbsp;<button class="btn btn-primary" id="cmdSave">Save</button
+          >&nbsp;<button class="btn btn-primary" id="cmdCopy">Copy</button>
+          <input class="form-control" type="text" id="saveInput" value="" />
+        </div>
+      </div>
+
+      <div class="row"><div class="form-group col-md-12"></div></div>
+
+      <hr />
+
+      <!--Calculator Params -->
+      <!--Time Stuff -->
+      <div class="row">
+        <div class="form-group col-md-4">
+          <label>Birthday (Year plus decimal)</label>
+          <input class="form-control" type="text" id="yob" value="" />
+        </div>
+        <div class="form-group col-md-4">
+          <label>Current Year</label>
+          <input class="form-control" type="text" id="startYear" value="" />
+        </div>
+        <div class="form-group col-md-4">
+          <label>Current Month (Number)</label>
+          <input class="form-control" type="text" id="startMonth" value="" />
+        </div>
+      </div>
+
+      <!--Calculation Parameters Ages -->
+      <div class="row">
+        <div class="form-group col-md-4">
+          <label>Calculate Until (Age plus decimal)</label>
+          <input class="form-control" type="text" id="endAge" value="" />
+        </div>
+        <div class="form-group col-md-4">
+          <label>Share Value</label>
+          <input class="form-control" type="text" id="initShareVal" value="" />
+        </div>
+        <div class="form-group col-md-4">
+          <label>Monthly Surplus</label>
+          <input class="form-control" type="text" id="bigMoney" value="" />
+        </div>
+      </div>
+
+      <!--Init Share Counts -->
+      <div class="row">
+        <div class="form-group col-md-3">
+          <label>LIRA Shares</label>
+          <input class="form-control" type="text" id="initLIRA" value="" />
+        </div>
+        <div class="form-group col-md-3">
+          <label>RRSP Shares</label>
+          <input class="form-control" type="text" id="initRRSP" value="" />
+        </div>
+        <div class="form-group col-md-3">
+          <label>TFSA Shares</label>
+          <input class="form-control" type="text" id="initTFSA" value="" />
+        </div>
+        <div class="form-group col-md-3">
+          <label>MRGN Shares</label>
+          <input class="form-control" type="text" id="initMRGN" value="" />
+        </div>
+      </div>
+
+      <!--Output -->
+
+      <hr />
+
+      <button class="btn btn-primary" id="cmdEnhance">Enhance</button
+      >&nbsp;<button class="btn btn-primary" id="cmdSim">Simulate</button>
+
+      <!--Final Share Counts -->
+      <div class="row">
+        <div class="form-group col-md-3">
+          <label>LIRA Shares</label>
+          <input class="form-control" type="text" id="endCountLIRA" value="" />
+        </div>
+        <div class="form-group col-md-3">
+          <label>RRSP Shares</label>
+          <input class="form-control" type="text" id="endCountRRSP" value="" />
+        </div>
+        <div class="form-group col-md-3">
+          <label>TFSA Shares</label>
+          <input class="form-control" type="text" id="endCountTFSA" value="" />
+        </div>
+        <div class="form-group col-md-3">
+          <label>MRGN Shares</label>
+          <input class="form-control" type="text" id="endCountMRGN" value="" />
+        </div>
+      </div>
+
+      <!--Final Share Values -->
+      <div class="row">
+        <div class="form-group col-md-3">
+          <label>LIRA Value</label>
+          <input class="form-control" type="text" id="endValLIRA" value="" />
+        </div>
+        <div class="form-group col-md-3">
+          <label>RRSP Value</label>
+          <input class="form-control" type="text" id="endValRRSP" value="" />
+        </div>
+        <div class="form-group col-md-3">
+          <label>TFSA Value</label>
+          <input class="form-control" type="text" id="endValTFSA" value="" />
+        </div>
+        <div class="form-group col-md-3">
+          <label>MRGN Value</label>
+          <input class="form-control" type="text" id="endValMRGN" value="" />
+        </div>
+      </div>
+
+      <!--Summary Values -->
+      <div class="row">
+        <div class="form-group col-md-3">
+          <label>Total Shares</label>
+          <input class="form-control" type="text" id="endCountAll" value="" />
+        </div>
+        <div class="form-group col-md-3">
+          <label>Total Value</label>
+          <input class="form-control" type="text" id="endValAll" value="" />
+        </div>
+        <div class="form-group col-md-3">
+          <label>Final Share Price</label>
+          <input class="form-control" type="text" id="endShareVal" value="" />
+        </div>
+        <div class="form-group col-md-3">
+          <label>Note</label>
+          <input class="form-control" type="text" id="note" value="" />
+        </div>
+      </div>
+    </div>
+
+    <div id="divExport"></div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="sgrinder.js"></script>
+  </body>
+</html>

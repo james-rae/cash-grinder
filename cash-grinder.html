@@ -1,113 +1,126 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <meta charset="utf-8" />
     <title>Cash Grinder</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" />
-</head>
-<body>
-
-<div class="container-fluid">
-    <!-- Input field for the saved state -->
-    <div class="row">
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <div class="container-fluid">
+      <!-- Input field for the saved state -->
+      <div class="row">
         <div class="form-group col-md-12">
-            <label>Saved State (paste it in the box!)</label>&nbsp;<button class="btn btn-primary" id='cmdLoad'>Load</button>&nbsp;<button class="btn btn-primary" id='cmdSave'>Save</button>&nbsp;<button class="btn btn-primary" id='cmdCopy'>Copy</button>
-            <input class="form-control" type="text" id="saveInput" value="" />
+          <label>Saved State (paste it in the box!)</label>&nbsp;<button
+            class="btn btn-primary"
+            id="cmdLoad"
+          >
+            Load</button
+          >&nbsp;<button class="btn btn-primary" id="cmdSave">Save</button
+          >&nbsp;<button class="btn btn-primary" id="cmdCopy">Copy</button>
+          <input class="form-control" type="text" id="saveInput" value="" />
         </div>
+      </div>
 
-    </div>
+      <div class="row"><div class="form-group col-md-12"></div></div>
 
-    <div class="row"><div class="form-group col-md-12">
-    </div></div>
+      <hr />
 
-    <!--Calculator Params -->
-    <!--Age Stuff -->
-    <div class="row">
+      <!--Calculator Params -->
+      <!--Age Stuff -->
+      <div class="row">
         <div class="form-group col-md-4">
-            <label>YOB</label>
-            <input class="form-control" type="text" id="yob" value="" />
+          <label>YOB</label>
+          <input class="form-control" type="text" id="yob" value="" />
         </div>
         <div class="form-group col-md-4">
-            <label>Emp Start Age</label>
-            <input class="form-control" type="text" id="empStart" value="" />
+          <label>Emp Start Age</label>
+          <input class="form-control" type="text" id="empStart" value="" />
         </div>
         <div class="form-group col-md-4">
-            <label>Emp End Age</label>
-            <input class="form-control" type="text" id="empEnd" value="" />
+          <label>Emp End Age</label>
+          <input class="form-control" type="text" id="empEnd" value="" />
         </div>
-    </div>
+      </div>
 
-    <!--Benefit Start Ages -->
-    <div class="row">
+      <!--Benefit Start Ages -->
+      <div class="row">
         <div class="form-group col-md-4">
-            <label>OAS Age</label>
-            <input class="form-control" type="text" id="oas" value="" />
+          <label>OAS Age</label>
+          <input class="form-control" type="text" id="oas" value="" />
         </div>
         <div class="form-group col-md-4">
-            <label>CCP Age</label>
-            <input class="form-control" type="text" id="ccp" value="" />
+          <label>CCP Age</label>
+          <input class="form-control" type="text" id="ccp" value="" />
         </div>
         <div class="form-group col-md-4">
-            <label>Pension Age</label>
-            <input class="form-control" type="text" id="pension" value="" />
+          <label>Pension Age</label>
+          <input class="form-control" type="text" id="pension" value="" />
         </div>
-    </div>
+      </div>
 
-    <!--RRSP Stuff -->
-    <div class="row">
+      <!--RRSP Stuff -->
+      <div class="row">
         <div class="form-group col-md-4">
-            <label>RRSP Start Age</label>
-            <input class="form-control" type="text" id="rrspStart" value="" />
+          <label>RRSP Start Age</label>
+          <input class="form-control" type="text" id="rrspStart" value="" />
         </div>
         <div class="form-group col-md-4">
-            <label>RRSP End Age</label>
-            <input class="form-control" type="text" id="rrspEnd" value="" />
+          <label>RRSP End Age</label>
+          <input class="form-control" type="text" id="rrspEnd" value="" />
         </div>
         <div class="form-group col-md-4">
-            <label>RRSP Balance</label>
-            <input class="form-control" type="text" id="rrspBal" value="" />
+          <label>RRSP Balance</label>
+          <input class="form-control" type="text" id="rrspBal" value="" />
         </div>
-    </div>
+      </div>
 
-    <!--LIRA Stuff -->
-    <div class="row">
+      <!--LIRA Stuff -->
+      <div class="row">
         <div class="form-group col-md-4">
-            <label>LIRA Start Age</label>
-            <input class="form-control" type="text" id="liraStart" value="" />
+          <label>LIRA Start Age</label>
+          <input class="form-control" type="text" id="liraStart" value="" />
         </div>
         <div class="form-group col-md-4">
-            <label>LIRA Balance</label>
-            <input class="form-control" type="text" id="liraBal" value="" />
+          <label>LIRA Balance</label>
+          <input class="form-control" type="text" id="liraBal" value="" />
         </div>
         <div class="form-group col-md-4">
-            <label>Pension Plan</label><br />
-            <span class="input-group-addon">
-                <input type="checkbox" id="cohortA" checked /> Pre-2013
-            </span>
+          <label>Pension Plan</label><br />
+          <span class="input-group-addon">
+            <input type="checkbox" id="cohortA" checked /> Pre-2013
+          </span>
         </div>
-    </div>
+      </div>
 
-    <!--Others -->
-    <div class="row">
+      <!--Others -->
+      <div class="row">
         <div class="form-group col-md-4">
-            <label>Avg Salary</label>
-            <input class="form-control" type="text" id="salary" value="" />
+          <label>Avg Salary</label>
+          <input class="form-control" type="text" id="salary" value="" />
         </div>
         <div class="form-group col-md-4">
-            <label>Avg Expenses</label>
-            <input class="form-control" type="text" id="expenses" value="" />
+          <label>Avg Expenses</label>
+          <input class="form-control" type="text" id="expenses" value="" />
         </div>
         <div class="form-group col-md-4">
-            <label>Description</label>
-            <input class="form-control" type="text" id="desc" value="" />
+          <label>Description</label>
+          <input class="form-control" type="text" id="desc" value="" />
         </div>
-    </div>
+      </div>
 
-    <!--Output -->
-    <!-- https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_table_insert_deleterow , https://www.w3schools.com/jsref/met_table_insertrow.asp -->
-    <div class="row"><div class="form-group col-md-12">
-        <button class="btn btn-primary" id='cmdEnhance'>Enhance</button>&nbsp;<button class="btn btn-primary" id='cmdExport'>Export</button>
-        <table class="table" id="dataTable">
+      <!--Output -->
+
+      <hr />
+
+      <!-- https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_table_insert_deleterow , https://www.w3schools.com/jsref/met_table_insertrow.asp -->
+      <div class="row">
+        <div class="form-group col-md-12">
+          <button class="btn btn-primary" id="cmdEnhance">Enhance</button
+          >&nbsp;<button class="btn btn-primary" id="cmdExport">Export</button>
+          <table class="table" id="dataTable">
             <thead>
               <tr>
                 <th scope="col">Year</th>
@@ -123,18 +136,16 @@
                 <th scope="col">Bridge</th>
               </tr>
             </thead>
-            <tbody>
-            </tbody>
+            <tbody></tbody>
           </table>
-    </div></div>
+        </div>
+      </div>
+    </div>
 
-</div>
+    <div id="divExport"></div>
 
-<div id="divExport"></div>
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"></script>
-<script src="grinder.js"></script>
-
-</body>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="grinder.js"></script>
+  </body>
 </html>
