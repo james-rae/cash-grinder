@@ -127,14 +127,14 @@ function putResults(iLIRA, iMRGN, iRRSP, iTFSA, fSharePrice) {
 function grindProjection() {
   const vals = getAllInput();
 
-  const yearPerf = scramblePerf();
+  // const yearPerf = scramblePerf();
 
   const newRoomTFSA = 6000;
   const newRoomRRSP = 3800;
 
   // working vars
   let yearCounter = t2i(vals[id.startMonth]) - 1;
-  let currYearPerf = yearPerf.pop();
+  let currYearPerf = 0.002583; // 3.1% div 12 months // yearPerf.pop();
   let roomTFSA = Math.max(0, 3 - yearCounter) * (newRoomTFSA / 3);
   let roomRRSP =
     yearCounter <= 4 ? newRoomRRSP : yearCounter === 5 ? newRoomRRSP / 2 : 0;
@@ -157,10 +157,10 @@ function grindProjection() {
       yearCounter = 0;
       roomRRSP += newRoomRRSP;
       roomTFSA += newRoomTFSA;
-      currYearPerf = yearPerf.pop();
+      // currYearPerf = yearPerf.pop();
 
       // inflation
-      iBigMoney = iBigMoney * 1.018;
+      // iBigMoney = iBigMoney * 1.018;
 
       // TODO factor in RRSP refund? Do that in march? Or just assume factored into bigMoney?
     }
