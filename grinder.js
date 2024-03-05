@@ -38,9 +38,9 @@ const saveOrder = [
   id.desc,
 ];
 
-// 2020 values
-const YMPE = 58700;
-const AMPE = 56440;
+// 2023 values
+const YMPE = 66600;
+const AMPE = 61840;
 
 const table = document.getElementById(id.table);
 
@@ -88,51 +88,55 @@ function t2i(textIn) {
 }
 
 function calcTax(iIncome, iAge) {
-  // TODO update to 2020 brackets/rates
+  // currently at 2023 tax year values
   let iTax;
   // fed
-  // 15% on the first $47,630 of taxable income, plus.
-  // 20.5% on the next $47,629 of taxable income (on the portion of taxable income over 47,630 up to $95,259), plus.
-  // 26% on the next $52,408 of taxable income (on the portion of taxable income over $95,259 up to $147,667), plus.
+  // 15% on the first $53,395 of taxable income, plus.
+  // 20.5% on the next $53,322 of taxable income (on the portion of taxable income over $53,395 up to $106,717), plus.
+  // 26% on the next $58,713 of taxable income (on the portion of taxable income over $106,717 up to $165,430), plus.
   iTax = iIncome * 0.15;
-  if (iIncome > 47629) {
-    iTax = iTax + (iIncome - 47629) * (0.205 - 0.15);
-    if (iIncome > 95259) {
-      iTax = iTax + (iIncome - 95259) * (0.26 - 0.205);
+  const fedBracket1 = 53395;
+  const fedBracket2 = 106717;
+  if (iIncome > fedBracket1) {
+    iTax = iTax + (iIncome - fedBracket1) * (0.205 - 0.15);
+    if (iIncome > fedBracket2) {
+      iTax = iTax + (iIncome - fedBracket2) * (0.26 - 0.205);
     }
   }
 
   // ont
-  // first $43,906    5.05%
-  // over $43,906 up To $87,813    9.15%
-  // over $87,813 up To $150,000    11.16%
+  // first $49,231    5.05%
+  // over $49,231 up To $98,463    9.15%
+  // over $98,463 up To $150,000    11.16%
   iTax = iTax + iIncome * 0.0505;
-  if (iIncome > 43906) {
-    iTax = iTax + (iIncome - 43906) * (0.0915 - 0.0505);
-    if (iIncome > 87813) {
-      iTax = iTax + (iIncome - 87813) * (0.1116 - 0.915);
+  const ontBracket1 = 49231;
+  const ontBracket2 = 98463;
+  if (iIncome > ontBracket1) {
+    iTax = iTax + (iIncome - ontBracket1) * (0.0915 - 0.0505);
+    if (iIncome > ontBracket2) {
+      iTax = iTax + (iIncome - ontBracket2) * (0.1116 - 0.915);
     }
   }
 
   // tax credits
 
-  // PESRSONAL AMOUNT
-  let canCred = 13229;
-  let ontCred = 10783;
+  // PESRSONAL AMOUNT (2023)
+  let canCred = 15000;
+  let ontCred = 11865;
 
   // AGE AMOUNT
   if (iAge > 64) {
-    // 2020 rates
-    canCred += 7637 - Math.max(0, iIncome - 38508) * 0.15;
-    ontCred += 5265 - Math.max(0, iIncome - 39546) * 0.15;
+    // 2023 rates
+    canCred += 8369 - Math.max(0, iIncome - 42335) * 0.15;
+    ontCred += 5793 - Math.max(0, iIncome - 43127) * 0.15;
   }
 
   // PENSION INCOME AMOUNT
   // assuming will always have > 2000 income as pensionable (LIRA, CPSP)
   if (iAge > 64) {
-    // 2020 rates
+    // 2023 rates
     canCred += 2000;
-    ontCred += 1500;
+    ontCred += 1641;
   }
 
   iTax = iTax - (canCred * 0.15 + ontCred * 0.0505);
@@ -142,8 +146,8 @@ function calcTax(iIncome, iAge) {
 
 function calcOas(iStartAge) {
   // 7.2% per year deferred
-  // 2020 Rate (Guess)
-  return (609 + 609 * (0.072 * (iStartAge - 65))) * 12;
+  // 2023 Rate
+  return (707 + 707 * (0.072 * (iStartAge - 65))) * 12;
 }
 
 function calcCpp(iStartAge, iQuitAge) {
@@ -153,10 +157,11 @@ function calcCpp(iStartAge, iQuitAge) {
   // can view statement of contribution at https://www.canada.ca/en/employment-social-development/services/my-account.html
   // check out https://retirehappy.ca/enhanced-cpp/ and http://www.holypotato.net/?p=1694
   // ---
-  // updated. age 55 is ~ 31 years. Current max monthly in 2022 is $1253.
+  // updated. age 55 is ~ 31 years. Current max monthly in 2023 is $1306.
   // use formula (years/40)*max month
+  // using prediction site, got 1243 so pretty close
 
-  let iCpp = 1253 * ((31 - (55 - iQuitAge)) / 40) * 12;
+  let iCpp = 1306 * (Math.min(31 - (55 - iQuitAge), 40) / 40) * 12;
   if (iStartAge < 65) {
     iCpp = iCpp - iCpp * (0.072 * (65 - iStartAge));
   } else if (iStartAge > 65) {
@@ -248,7 +253,11 @@ function grindProjection() {
   for (let iAge = iQuitAge; iAge <= 95; iAge++) {
     const iRR = iAge >= iRrspStart && iAge <= iRrspEnd ? iRRSPAmt : 0;
     const iCp = iAge >= iCppAge ? iCppAmt : 0;
-    const iOa = iAge >= iOasAge ? iOasAmt : 0;
+    let iOa = iAge >= iOasAge ? iOasAmt : 0;
+    if (iAge > 74) {
+      // starting 2022, OAS increases 10% at age 75 and up
+      iOa = iOa * 1.1;
+    }
     const iBr = iAge >= iPensionAge && iAge < 65 && iAge > 54 ? iBridgeAmt : 0;
     const iPn = iAge >= iPensionAge ? iPensionAmt : 0;
     let iLira = 0;
